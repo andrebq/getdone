@@ -25,15 +25,6 @@ func (c *CreateTask) CreateTask(name, description string) (*entity.Task, error) 
 	return t, err
 }
 
-// Repository for finding projects
-type ProjectRepo interface {
-	ByName(name string) (*entity.Project, error)
-}
-
-type TaskRepo interface {
-	Save(t *entity.Task) error
-}
-
 func NewCreateTask() *CreateTask {
 	return new(CreateTask)
 }
