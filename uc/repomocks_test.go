@@ -69,11 +69,21 @@ func (m *MockTaskRepo) AllByState(projId int64, done bool) ([]*entity.Task, erro
 	m.ensureData()
 	ret := make([]*entity.Task, 0)
 	for _, v := range m.data {
-		print("v.Project: ", v.Project, "\n")
 		if v.Project != nil && v.Project.Id == projId {
 			if v.Done == done {
 				ret = append(ret, v)
 			}
+		}
+	}
+	return ret, nil
+}
+
+func (m *MockTaskRepo) AllByProject(projId int64) ([]*entity.Task, error) {
+	m.ensureData()
+	ret := make([]*entity.Task, 0)
+	for _, v := range m.data {
+		if v.Project != nil && v.Project.Id == projId {
+			ret = append(ret, v)
 		}
 	}
 	return ret, nil

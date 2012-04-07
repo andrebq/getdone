@@ -22,6 +22,11 @@ func (l *ListTasks) AllOpen() ([]*entity.Task, error) {
 	return l.TaskRepo.AllByState(l.p.Id, false)
 }
 
+// Return all the tasks both open and closed
+func (l *ListTasks) All() ([]*entity.Task, error) {
+	return l.TaskRepo.AllByProject(l.p.Id)
+}
+
 func NewListTasks() *ListTasks {
 	return &ListTasks{}
 }
