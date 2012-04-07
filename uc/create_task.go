@@ -19,7 +19,7 @@ func (c *CreateTask) SelectProject(name string) (*entity.Project, error) {
 	return c.project, err
 }
 
-func (c *CreateTask) CreateTask(name, description string) (*entity.Task, error) {
+func (c *CreateTask) Create(name, description string) (*entity.Task, error) {
 	t := &entity.Task{0, name, description, false, c.project}
 	err := c.TaskRepo.Save(t)
 	return t, err

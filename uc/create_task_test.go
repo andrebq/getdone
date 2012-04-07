@@ -17,7 +17,7 @@ func TestCreateNewTask(t *testing.T) {
 
 	et := &entity.Task{1, "This is the task title", "This is the task description", false, project}
 
-	task, err := ct.CreateTask(et.Title, et.Description)
+	task, err := ct.Create(et.Title, et.Description)
 	if err != nil {
 		t.Fatalf("Unable to create the task. Cause: %v", err)
 	}

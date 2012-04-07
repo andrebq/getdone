@@ -11,7 +11,7 @@ func TestCompleteTask(t *testing.T) {
 	create.TaskRepo = new(MockTaskRepo)
 
 	create.SelectProject("test")
-	create.CreateTask("title", "desc")
+	create.Create("title", "desc")
 
 	ct := NewCompleteTask()
 	ct.TaskRepo = create.TaskRepo
