@@ -6,10 +6,31 @@ import (
 	"github.com/andrebq/getdone/entity"
 )
 
-type MockProjectRepo struct{}
+type MockProjectRepo struct {
+	data map[int64]*entity.Project
+}
+
+func (m *MockProjectRepo) ensureData() {
+	if m.data == nil {
+		m.data = make(map[int64]*entity.Project)
+	}
+}
 
 func (m *MockProjectRepo) ByName(name string) (*entity.Project, error) {
-	return &entity.Project{1, name}, nil
+	m.ensureData()
+	project := &entity.Project{0, name}
+	m.Save(project)
+	return project, nil
+}
+
+func (m *MockProjectRepo) Save(p *entity.Project) error {
+	m.ensureData()
+	if p.Id == 0 {
+		p.Id = int64(len(m.data) + 1)
+		m.data[p.Id] = p
+	}
+	m.data[p.Id] = p
+	return nil
 }
 
 type MockTaskRepo struct {
