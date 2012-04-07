@@ -10,6 +10,10 @@ func TestCompleteTask(t *testing.T) {
 	create.ProjectRepo = new(MockProjectRepo)
 	create.TaskRepo = new(MockTaskRepo)
 
+	createPrj := NewCreateProject()
+	createPrj.ProjectRepo = create.ProjectRepo
+	createPrj.Create("test")
+
 	create.SelectProject("test")
 	create.Create("title", "desc")
 

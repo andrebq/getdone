@@ -20,6 +20,10 @@ func (c *CreateTask) SelectProject(name string) (*entity.Project, error) {
 }
 
 func (c *CreateTask) Create(name, description string) (*entity.Task, error) {
+	if c.project == nil {
+		return nil, newInvalidState("The project is required to create a new task. Use Select")
+	}
+
 	t := &entity.Task{0, name, description, false, c.project}
 	err := c.TaskRepo.Save(t)
 	return t, err

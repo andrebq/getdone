@@ -18,9 +18,12 @@ func (m *MockProjectRepo) ensureData() {
 
 func (m *MockProjectRepo) ByName(name string) (*entity.Project, error) {
 	m.ensureData()
-	project := &entity.Project{0, name}
-	m.Save(project)
-	return project, nil
+	for _, v := range m.data {
+		if v.Name == name {
+			return v, nil
+		}
+	}
+	return nil, errors.New("Project not found")
 }
 
 func (m *MockProjectRepo) Save(p *entity.Project) error {
@@ -45,6 +48,7 @@ func (m *MockTaskRepo) ensureData() {
 
 func (m *MockTaskRepo) Save(t *entity.Task) error {
 	m.ensureData()
+
 	if t.Id == 0 {
 		t.Id = int64(len(m.data) + 1)
 		m.data[t.Id] = t
@@ -59,4 +63,18 @@ func (m *MockTaskRepo) ById(id int64) (*entity.Task, error) {
 		return t, nil
 	}
 	return nil, errors.New(fmt.Sprintf("Unable to find task %v", id))
+}
+
+func (m *MockTaskRepo) AllByState(projId int64, done bool) ([]*entity.Task, error) {
+	m.ensureData()
+	ret := make([]*entity.Task, 0)
+	for _, v := range m.data {
+		print("v.Project: ", v.Project, "\n")
+		if v.Project != nil && v.Project.Id == projId {
+			if v.Done == done {
+				ret = append(ret, v)
+			}
+		}
+	}
+	return ret, nil
 }

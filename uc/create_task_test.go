@@ -10,6 +10,11 @@ func TestCreateNewTask(t *testing.T) {
 	ct := NewCreateTask()
 	ct.ProjectRepo = new(MockProjectRepo)
 	ct.TaskRepo = new(MockTaskRepo)
+
+	createPrj := NewCreateProject()
+	createPrj.ProjectRepo = ct.ProjectRepo
+	createPrj.Create("testproject")
+
 	project, err := ct.SelectProject("testproject")
 	if err != nil {
 		t.Fatalf("Unable to select project. Cause: %v", err)
