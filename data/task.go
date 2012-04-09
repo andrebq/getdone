@@ -4,6 +4,6 @@ type Task struct {
 	Id          int64
 	Title       string
 	Description string
-	Done	bool
+	Done        bool
 	ProjectId   int64
 }

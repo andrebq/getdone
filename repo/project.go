@@ -39,6 +39,6 @@ func (p *Project) ById(id int64) (*entity.Project, error) {
 	return p.dataToEntity(dt), err
 }
 
-func (p *Project) dataToEntity(dt *data.Project) (*entity.Project) {
+func (p *Project) dataToEntity(dt *data.Project) *entity.Project {
 	return &entity.Project{dt.Id, dt.Name}
 }
