@@ -21,7 +21,7 @@ func (p *Project) Save(proj *entity.Project) error {
 	}
 
 	dt := &data.Project{proj.Id, proj.Name}
-	_, err := p.db.C("projects").Upsert(bson.M{"Id": proj.Id}, dt)
+	_, err := p.db.C("projects").Upsert(bson.M{"id": proj.Id}, dt)
 	return err
 }
 
@@ -29,5 +29,16 @@ func (p *Project) Save(proj *entity.Project) error {
 func (p *Project) ByName(name string) (*entity.Project, error) {
 	dt := &data.Project{}
 	err := p.db.C("projects").Find(bson.M{"name": name}).One(&dt)
-	return &entity.Project{dt.Id, dt.Name}, err
+	return p.dataToEntity(dt), err
+}
+
+// Fetch the project by id
+func (p *Project) ById(id int64) (*entity.Project, error) {
+	dt := &data.Project{}
+	err := p.db.C("projects").Find(bson.M{"id": id}).One(&dt)
+	return p.dataToEntity(dt), err
+}
+
+func (p *Project) dataToEntity(dt *data.Project) (*entity.Project) {
+	return &entity.Project{dt.Id, dt.Name}
 }
