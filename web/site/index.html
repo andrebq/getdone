@@ -1,0 +1,32 @@
+<! DOCTYPE html >
+<html>
+	<head>
+		<title>GetDone - Simple project ToDo list</title>
+		<link rel="stylesheet" type="text/css" href="style/main.css">
+	</head>
+	<body>
+		<h1>GetDone</h1>
+		<p> Aparentemente você não possui nenhum projeto em andamento ou então deseja criar um novo projeto. Nesse caso, informe abaixo o nome e descrição do projeto para prosseguir. Assim que criar o projeto você será redirecionado para a URL do mesmo, você deve salvar essa url nos seus favoritos para facilitar o seu acesso.</p>
+		<p> Os projetos são públicos por padrão e a forma de acesso é através da URL do mesmo</p>
+
+		<fieldset>
+			<legend>Novo projeto</legend>
+			<form method="POST" action="createProject">
+				<div class="field">
+					<label for="name">Nome do projeto:</label>
+					<input type="text" maxlength="40" id="name" name="name">
+				</div>
+
+				<div class="field">
+					<label for="desc">Descrição:</label>
+					<textarea id="desc" name="desc"></textarea>
+				</div>
+
+				<div class="buttons">
+					<button>Criar projeto</button>
+				</div>
+			</form>
+		</fieldset>
+		<script type="text/javascript" src="script/jquery.js"></script>
+	</body>
+</html>
