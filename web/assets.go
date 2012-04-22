@@ -36,21 +36,36 @@ func ServeStatic(w http.ResponseWriter, req *http.Request) {
 		resPath = fixStatic(req.URL.Path)
 	}
 
-	resPath, err := filepath.Abs(filepath.FromSlash(resPath))
+	resPath, err := fixAbs(w, req, resPath)
+	// can return since fixAbs already set the headers in the response
+	if err != nil {
+		return
+	}
+
+	http.ServeFile(w, req, filepath.FromSlash(resPath))
+}
+
+// Convert the path to the system-depended absolut version of the path.
+//
+// If an error happens and the conversion can't be completed, set  404 status code. The mapping is logged for futher use
+func fixAbs(w http.ResponseWriter, req *http.Request, path string) (resPath string, err error) {
+	resPath, err = filepath.Abs(filepath.FromSlash(path))
 	if err != nil {
 		l.Error("Error while fetching the Abs path for %v. %v", req.URL.Path, err)
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}
-
-	l.Info("%v mapped to %v", req.URL.Path, resPath)
-	http.ServeFile(w, req, filepath.FromSlash(resPath))
+	l.Printf("STATIC_MAP ", "%v mapped to %v", req.URL.Path, resPath)
+	return
 }
 
 // Serve static files without any processing
 func serveAsset(w http.ResponseWriter, req *http.Request) {
-	assetPath := fixAsset(req.URL.Path)
-	http.ServeFile(w, req, filepath.FromSlash(assetPath))
+	assetPath, err := fixAbs(w, req, fixAsset(req.URL.Path))
+	if err != nil {
+		return
+	}
+	http.ServeFile(w, req, assetPath)
 }
 
 // just invoke the serveAsset

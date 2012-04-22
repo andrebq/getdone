@@ -15,9 +15,9 @@ var (
 func Root(root, prefix string) http.Handler {
 	rootFolder = root
 	mux := pat.New()
+	mux.Get("/script/", http.HandlerFunc(LoadAsset))
+	mux.Get("/style/", http.HandlerFunc(LoadAsset))
 	mux.Get("/", http.HandlerFunc(ServeStatic))
-	mux.Get("/script", http.HandlerFunc(LoadAsset))
-	mux.Get("/style", http.HandlerFunc(LoadAsset))
 
 	rootHndl := http.StripPrefix(prefix, mux)
 	return Log(rootHndl)

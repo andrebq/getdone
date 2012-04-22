@@ -2,18 +2,18 @@ package main
 
 import (
 	"flag"
-	"net/http"
-	"github.com/andrebq/getdone/web"
 	"github.com/andrebq/getdone/log"
+	"github.com/andrebq/getdone/web"
+	"net/http"
 )
 
 var (
-	start *string = flag.String("s", "web", "What kind of app to start")
-	port *string = flag.String("port", ":8080", "Port to listen for http connections")
+	start  *string = flag.String("s", "web", "What kind of app to start")
+	port   *string = flag.String("port", ":8080", "Port to listen for http connections")
 	prefix *string = flag.String("prefix", "", "Prefix of the web application")
-	root *string = flag.String("root", "./", "Root path to load contents. Must be the \"site\" folder.")
-	help *bool = flag.Bool("h", false, "Show this help")
-	l = &log.Log{}
+	root   *string = flag.String("root", "./", "Root path to load contents. Must be the \"site\" folder.")
+	help   *bool   = flag.Bool("h", false, "Show this help")
+	l              = &log.Log{}
 )
 
 func main() {
@@ -24,9 +24,11 @@ func main() {
 		return
 	}
 
-	switch(*start) {
-		case "web": runWeb()
-		default: usage()
+	switch *start {
+	case "web":
+		runWeb()
+	default:
+		usage()
 	}
 }
 
