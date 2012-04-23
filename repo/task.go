@@ -42,3 +42,7 @@ func (t *Task) ById(id int64) (*entity.Task, error) {
 
 	return ret, nil
 }
+
+func NewTask(db *mgo.Database, pRepo *Project) *Task {
+	return &Task{db, pRepo}
+}

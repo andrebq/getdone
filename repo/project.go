@@ -39,6 +39,11 @@ func (p *Project) ById(id int64) (*entity.Project, error) {
 	return p.dataToEntity(dt), err
 }
 
+// Create a new Project repo
+func NewProject(db *mgo.Database) *Project {
+	return &Project{db}
+}
+
 func (p *Project) dataToEntity(dt *data.Project) *entity.Project {
 	return &entity.Project{dt.Id, dt.Name}
 }

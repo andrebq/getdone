@@ -3,7 +3,9 @@ package web
 import (
 	"github.com/andrebq/getdone/log"
 	"github.com/bmizerany/pat"
+	"encoding/json"
 	"net/http"
+	"fmt"
 )
 
 var (
@@ -29,4 +31,19 @@ func Log(hndl http.Handler) http.Handler {
 		l.Info("%v %v", req.Method, req.URL)
 		hndl.ServeHTTP(w, req)
 	})
+}
+
+// Serialize the data object into a JsonObject and write the contents to the reponse
+//
+// This call doesn't use the cuncked Transfer-Encoding since it will set the Content-Length header
+// If the mimetype isn't specified (ie mimetype == "") application/json is used
+func WriteJson(w http.ResponseWriter, data interface{}, mimetype string, okStatus int) (n int, err error) {
+	tmp, err := json.Marshal(data)
+	if err != nil {
+		return
+	}
+	w.Header().Set("Content-Length", fmt.Sprintf("%v", len(tmp)))
+	w.WriteHeader(okStatus)
+	n, err = w.Write(tmp)
+	return
 }
