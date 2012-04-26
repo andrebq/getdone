@@ -1,0 +1,57 @@
+<! DOCTYPE html >
+<html ng-app>
+	<head>
+		<title>GetDone - Task listing</title>
+		<link rel="stylesheet" type="text/css" href="style/normalize.css">
+		<link rel="stylesheet" type="text/css" href="style/main.css">
+		<script type="text/javascript" src="script/jquery.js"></script>
+		<script type="text/javascript" src="script/angular.js"></script>
+		<script type="text/javascript">
+			(function(w, $){
+				var fn = {
+					focusFirst : function() {
+						// focus on the first data-focus element
+						$("[data-focus]").first().focus();
+					}
+				}
+				w.UserCtrl = function($scope) {
+					$scope.name = "Andre Moraes";
+				};
+
+				w.TaskCtrl = function($scope) {
+					$scope.tasks = [ { "title":"Do something nice with this AngularJs thing.", "done":false} ];
+					$scope.addTask = function() {
+						$scope.task.done = false;
+						$scope.tasks.push($scope.task);
+						$scope.clear();
+					};
+					$scope.clear = function() {
+						$scope.task = {done:false, title:""};
+						fn.focusFirst();
+					};
+					$scope.inputName = "Describe the task.";
+				};
+
+				$(fn.focusFirst);
+			}(window, window.jQuery));
+		</script>
+		<style>
+			span.done-false {
+				color: red;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>Project</h2>
+		<h3 ng-controller="UserCtrl">These are the tasks for you Mr. {{ name }}!</h3>
+		<div class="tasks" ng-controller="TaskCtrl">
+			<ul ng-repeat="task in tasks">
+				<li><span class="subject done-{{task.done}}">{{task.title}}</span></li>
+			</ul>
+			<form>
+				<input type="text" placeholder="{{emptyTask.title}}" ng-model="task.title" data-focus>
+				<button ng-click="addTask()">Add</button>
+			</form>
+		</div>
+	</body>
+</html>
