@@ -45,13 +45,14 @@ func ListTasks(w http.ResponseWriter, req *http.Request) {
 	} else {
 		lt := uc.NewListTasks()
 		db := session.DB("getdone")
-		lt.ProjectRepo = repo.NewProject(db)
-		lt.TaskRepo = repo.NewTask(db, lt.ProjectRepo)
-		open, err := lt.AllOpen()
+		prepo := repo.NewProject(db)
+		lt.ProjectRepo = prepo
+		lt.TaskRepo = repo.NewTask(db, prepo)
+		_, err := lt.AllOpen()
 		if err != nil {
 			http.Error(w, "Unable to fetch open tasks list", http.StatusInternalServerError)
 		} else {
-			_, err = WriteJson(w, data, "", http.StatusOK)
+			_, err = WriteJson(w, nil, "", http.StatusOK)
 			if err != nil {
 				http.Error(w, "Unable to write the reponse", http.StatusInternalServerError)
 			}

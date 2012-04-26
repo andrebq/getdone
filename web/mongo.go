@@ -13,8 +13,8 @@ var (
 )
 
 // Must initialize the mongo session
-func InitMongo(url string) error{
-	session, err := mgo.Dial(url)
+func InitMongo(url string) ( err error ){
+	session, err = mgo.Dial(url)
 	return err
 }
 
@@ -22,10 +22,10 @@ func InitMongo(url string) error{
 func Session(ctx *Context) *mgo.Session {
 	if s, has := ctx.Get(sid); has {
 		return s.(*mgo.Session)
-	} else {
-		s = session.Clone()
-		ctx.Set(sid, s)
 	}
+	s := session.Clone()
+	ctx.Set(sid, s)
+	return s
 }
 
 // Ensure that a valid session is already present in the Context when hndl.ServeHTTP is called.
