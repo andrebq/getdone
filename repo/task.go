@@ -43,12 +43,24 @@ func (t *Task) ById(id int64) (*entity.Task, error) {
 	return ret, nil
 }
 
-func (t *Task) AllByProject(id int64) (ret []*entity.Task, err error) {
-	dt := &data.Task{}
+func (t *Task) AllByProject(projid int64) (ret []*entity.Task, err error) {
+	it := t.db.C("tasks").Find(bson.M{"projectid":projid}).Iter()
 
-	it := t.db.C("tasks").Find(bson.M{"projectid":id}).Iter()
+	ret, err = t.returnArray(it, projid)
+	return
+}
 
-	p, err := t.Project.ById(id)
+func (t *Task) AllByState(projid int64, state bool) (ret []*entity.Task, err error) {
+	it := t.db.C("tasks").Find(bson.M{"projectid":projid, "done":state}).Iter()
+
+	ret, err = t.returnArray(it, projid)
+	return
+}
+
+func (t *Task) returnArray(it *mgo.Iter, projid int64) (ret []*entity.Task, err error) {
+	var dt *data.Task
+
+	p, err := t.Project.ById(projid)
 	// error while searching for the project
 	// no need to proceed
 	if err != nil {
@@ -56,6 +68,7 @@ func (t *Task) AllByProject(id int64) (ret []*entity.Task, err error) {
 	}
 
 	ret = make([]*entity.Task, 0)
+	dt = &data.Task{}
 	for it.Next(&dt) {
 		ret = append(ret, &entity.Task{dt.Id, dt.Title, dt.Description, dt.Done, p})
 	}
