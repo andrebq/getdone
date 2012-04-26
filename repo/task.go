@@ -43,6 +43,28 @@ func (t *Task) ById(id int64) (*entity.Task, error) {
 	return ret, nil
 }
 
+func (t *Task) AllByProject(id int64) (ret []*entity.Task, err error) {
+	dt := &data.Task{}
+
+	it := t.db.C("tasks").Find(bson.M{"projectid":id}).Iter()
+
+	p, err := t.Project.ById(id)
+	// error while searching for the project
+	// no need to proceed
+	if err != nil {
+		return
+	}
+
+	ret = make([]*entity.Task, 0)
+	for it.Next(&dt) {
+		ret = append(ret, &entity.Task{dt.Id, dt.Title, dt.Description, dt.Done, p})
+	}
+	// in case of any error while fetching the results
+	// set this to the return
+	err = it.Err()
+	return
+}
+
 func NewTask(db *mgo.Database, pRepo *Project) *Task {
 	return &Task{db, pRepo}
 }
