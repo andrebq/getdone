@@ -18,8 +18,8 @@
 					$scope.name = "Andre Moraes";
 				};
 
-				w.TaskCtrl = function($scope) {
-					$scope.tasks = [ { "title":"Do something nice with this AngularJs thing.", "done":false} ];
+				w.TaskCtrl = function($scope, $http) {
+					$scope.tasks = [ ];
 					$scope.addTask = function() {
 						$scope.task.done = false;
 						$scope.tasks.push($scope.task);
@@ -29,7 +29,15 @@
 						$scope.task = {done:false, title:""};
 						fn.focusFirst();
 					};
+					$scope.fetch = function() {
+						$http.get('tasks.json').success(function(data, status){
+							$scope.tasks = data;
+						}).error(function(){console.log('unable to fetch data');});
+					};
 					$scope.inputName = "Describe the task.";
+
+					// do the first fetch automagically
+					$scope.fetch();
 				};
 
 				$(fn.focusFirst);
