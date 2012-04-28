@@ -3,7 +3,7 @@
 	<head>
 		<title>GetDone - Task listing</title>
 		<link rel="stylesheet" type="text/css" href="style/normalize.css">
-		<link rel="stylesheet" type="text/css" href="style/main.css">
+		<!-- <link rel="stylesheet" type="text/css" href="style/main.css"> -->
 		<script type="text/javascript" src="script/jquery.js"></script>
 		<script type="text/javascript" src="script/angular.js"></script>
 		<script type="text/javascript">
@@ -12,33 +12,37 @@
 					focusFirst : function() {
 						// focus on the first data-focus element
 						$("[data-focus]").first().focus();
+					},
+					ctrl: function(deps, ctrl) {
+						ctrl.$inject = deps;
+						return ctrl;
 					}
 				}
-				w.UserCtrl = function($scope) {
-					$scope.name = "Andre Moraes";
-				};
+				w.UserCtrl = fn.ctrl(["$scope"], function($s) {
+					$s.name = "Andre Moraes";
+				});
 
-				w.TaskCtrl = function($scope, $http) {
-					$scope.tasks = [ ];
-					$scope.addTask = function() {
-						$scope.task.done = false;
-						$scope.tasks.push($scope.task);
-						$scope.clear();
+				w.TaskCtrl = fn.ctrl(["$scope","$http"], function($s, $http) {
+					$s.tasks = [ ];
+					$s.addTask = function() {
+						$s.task.done = false;
+						$s.tasks.push($s.task);
+						$s.clear();
 					};
-					$scope.clear = function() {
-						$scope.task = {done:false, title:""};
+					$s.clear = function() {
+						$s.task = {done:false, title:""};
 						fn.focusFirst();
 					};
-					$scope.fetch = function() {
+					$s.fetch = function() {
 						$http.get('tasks.json').success(function(data, status){
-							$scope.tasks = data;
+							$s.tasks = data;
 						}).error(function(){console.log('unable to fetch data');});
 					};
-					$scope.inputName = "Describe the task.";
+					$s.inputName = "Describe the task.";
 
 					// do the first fetch automagically
-					$scope.fetch();
-				};
+					$s.fetch();
+				});
 
 				$(fn.focusFirst);
 			}(window, window.jQuery));
