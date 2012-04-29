@@ -1,11 +1,12 @@
 package web
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/andrebq/getdone/log"
 	"github.com/bmizerany/pat"
-	"encoding/json"
 	"net/http"
-	"fmt"
+	"net/url"
 )
 
 var (
@@ -17,6 +18,12 @@ var (
 func Root(root, prefix string) http.Handler {
 	rootFolder = root
 	mux := pat.New()
+
+	// mapping the API
+	mux.Post("/newproject", EnsureSession(http.HandlerFunc(CreateProject)))
+	mux.Get("/tasks.json", http.HandlerFunc(ListTasks))
+
+	// mapping static assets and files
 	mux.Get("/script/", http.HandlerFunc(LoadAsset))
 	mux.Get("/style/", http.HandlerFunc(LoadAsset))
 	mux.Get("/", http.HandlerFunc(ServeStatic))
@@ -46,4 +53,26 @@ func WriteJson(w http.ResponseWriter, data interface{}, mimetype string, okStatu
 	w.WriteHeader(okStatus)
 	n, err = w.Write(tmp)
 	return
+}
+
+// Resolve the "path" relative to the URL of the given request.
+func ResolveRef(req *http.Request, path string, params ...interface{}) *url.URL {
+	url, err := url.Parse(path)
+	if err != nil {
+		panic(err)
+	}
+	// TODO see the better way to handle the reverse-proxy case.
+	url = req.URL.ResolveReference(url)
+	print("ResolvedUrl: ", url.String(), "\n")
+	q := url.Query()
+
+	for i := 0; i < len(params); {
+		name := fmt.Sprintf("%v", params[i])
+		i++
+		value := fmt.Sprintf("%v", params[i])
+		q.Set(name, value)
+		i++
+	}
+	url.RawQuery = q.Encode()
+	return url
 }

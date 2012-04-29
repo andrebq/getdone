@@ -1,17 +1,15 @@
 package web
 
 import (
-	"net/http"
-	"github.com/andrebq/getdone/uc"
 	"github.com/andrebq/getdone/repo"
-	"fmt"
+	"github.com/andrebq/getdone/uc"
 	"io"
+	"net/http"
 )
 
 // API call for creating a new project
 func CreateProject(w http.ResponseWriter, req *http.Request) {
-	ctx := OpenCtx(req)
-	session := Session(ctx)
+	session := Session(req)
 
 	req.ParseForm()
 	name := req.Form.Get("name")
@@ -23,8 +21,8 @@ func CreateProject(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			http.Error(w, "Unable to create project repo", http.StatusInternalServerError)
 		} else {
+			w.Header().Set("Location", ResolveRef(req, "../tasks", "projectid", int64(p.Id)).String())
 			w.WriteHeader(http.StatusCreated)
-			w.Header().Set("Location", fmt.Sprintf("%v", p.Id))
 		}
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
@@ -34,14 +32,13 @@ func CreateProject(w http.ResponseWriter, req *http.Request) {
 
 // API call for listing all the pending tasks of a project
 func ListTasks(w http.ResponseWriter, req *http.Request) {
-	ctx := OpenCtx(req)
-	session := Session(ctx)
+	session := Session(req)
 
 	req.ParseForm()
-	projName := req.URL.Query().Get("project")
+	projName := req.URL.Query().Get("projectid")
 	if projName == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, "Cannot list without project name")
+		io.WriteString(w, "Cannot list without project Id")
 	} else {
 		lt := uc.NewListTasks()
 		db := session.DB("getdone")

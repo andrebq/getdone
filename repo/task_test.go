@@ -87,7 +87,7 @@ func TestAllByProj(t *testing.T) {
 		t.Fatalf("Error while fetching tasks. Array should have 1 record.")
 	}
 
-	for _, t2 := range(tasks) {
+	for _, t2 := range tasks {
 		if !reflect.DeepEqual(task, t2) {
 			t.Fatalf("Expecting %v got %v", task, t2)
 		}
@@ -134,7 +134,7 @@ func TestAllByState(t *testing.T) {
 		t.Fatalf("Error while fetching tasks. Array should have 1 record.")
 	}
 
-	for _, t2 := range(tasks) {
+	for _, t2 := range tasks {
 		if !reflect.DeepEqual(task, t2) {
 			t.Fatalf("Expecting %v got %v", task, t2)
 		}

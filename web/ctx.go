@@ -1,8 +1,8 @@
 package web
 
 import (
-	"sync"
 	"net/http"
+	"sync"
 )
 
 // Store random data.
@@ -15,7 +15,7 @@ import (
 // Inspiration from Brad Fitizpatrick: http://groups.google.com/group/golang-nuts/msg/e2d679d303aa5d53
 type Context struct {
 	data map[interface{}]interface{}
-	l sync.RWMutex
+	l    sync.RWMutex
 }
 
 // Read the key from the context.
@@ -33,6 +33,12 @@ func (c *Context) Set(key interface{}, val interface{}) (old interface{}, has bo
 	old, has = c.Get(key)
 	c.data[key] = val
 	return
+}
+
+func (c *Context) Remove(key interface{}) {
+	c.l.Lock()
+	defer c.l.Unlock()
+	delete(c.data, key)
 }
 
 // Used to define private keys
@@ -56,15 +62,16 @@ func OpenCtx(k *http.Request) *Context {
 	if ctx, has := internalCtx.Get(pk); has {
 		return ctx.(*Context)
 	}
-	return nil
+	ctx := NewContext()
+	internalCtx.Set(pk, ctx)
+	return ctx
 }
 
 // Remove the context associated with the request
 func closeCtx(k *http.Request) {
 	pk := privateKey(k)
 	if _, has := internalCtx.Get(pk); has {
-		// remove from the map
-		delete(internalCtx.data, pk)
+		internalCtx.Remove(pk)
 	}
 }
 
@@ -72,8 +79,11 @@ func closeCtx(k *http.Request) {
 //
 // The user can call Open(req) as many times as he wants and only one instance will be created per request object
 func BindContext(hndl http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request){
-		OpenCtx(req)
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		print("Binding context\n")
+		ctx := OpenCtx(req)
+		print("BindContext: ", ctx, "\n")
+
 		defer closeCtx(req)
 		hndl.ServeHTTP(w, req)
 	})

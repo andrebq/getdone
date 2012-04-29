@@ -2,8 +2,10 @@ package web
 
 import (
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 // Load the assets from the assets folder compiling if necessary, there are three kinds of assets that this handler can serve
@@ -55,6 +57,17 @@ func fixAbs(w http.ResponseWriter, req *http.Request, path string) (resPath stri
 		http.Error(w, "", http.StatusNotFound)
 		return
 	}
+	// if the don't have a .html sufix
+	// then check if the directory or file exists
+	// if not, check if the same file (with the .html prefix) exists
+	// if true, return the .html path instead of a 404 error.
+	if !strings.HasSuffix(resPath, ".html") {
+		_, err := os.Open(resPath)
+		if os.IsNotExist(err) {
+			resPath = resPath + ".html"
+		}
+	}
+
 	l.Printf("STATIC_MAP ", "%v mapped to %v", req.URL.Path, resPath)
 	return
 }

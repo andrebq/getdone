@@ -1,33 +1,79 @@
 <! DOCTYPE html >
-<html>
+<html ng-app>
 	<head>
 		<title>GetDone - Simple project ToDo list</title>
 		<link rel="stylesheet" type="text/css" href="style/normalize.css">
-		<link rel="stylesheet" type="text/css" href="style/main.css">
+		<style>
+			a.project-new {
+				display: none;
+			}
+			a.project-created {
+				display: inline;
+				color: green;
+			}
+			ul.errorlist-true {
+				display: block;
+				color: red;
+			}
+			ul.errorlist-false {
+				display: none;
+			}
+		</style>
 	</head>
 	<body>
 		<h1>GetDone</h1>
 		<p> Aparentemente você não possui nenhum projeto em andamento ou então deseja criar um novo projeto. Nesse caso, informe abaixo o nome e descrição do projeto para prosseguir. Assim que criar o projeto você será redirecionado para a URL do mesmo, você deve salvar essa url nos seus favoritos para facilitar o seu acesso.</p>
 		<p> Os projetos são públicos por padrão e a forma de acesso é através da URL do mesmo</p>
 
-		<fieldset>
+		<fieldset ng-controller="ProjectCtrl">
 			<legend>Novo projeto</legend>
-			<form method="POST" action="createProject">
+			<form>
 				<div class="field">
 					<label for="name">Nome do projeto:</label>
-					<input type="text" maxlength="40" id="name" name="name">
-				</div>
-
-				<div class="field">
-					<label for="desc">Descrição:</label>
-					<textarea id="desc" name="desc"></textarea>
+					<input type="text" maxlength="40" id="title" name="title" ng-model="project.title">
 				</div>
 
 				<div class="buttons">
-					<button>Criar projeto</button>
+					<button ng-click="add()">Criar projeto</button>
+					<ul class="errorlist-{{haserrors()}}">
+						<li ng-repeat="err in errors">{{err}}</li>
+					</ul>
+					<a href="{{project.href}}" class="project-{{project.state}}">{{project.title}}</a>
 				</div>
 			</form>
 		</fieldset>
 		<script type="text/javascript" src="script/jquery.js"></script>
+		<script type="text/javascript" src="script/angular.js"></script>
+		<script type="text/javascript">
+			(function(w,$){
+				var fn = {
+					ctrl: function(deps, fn) {
+						fn.$inject = deps;
+						return fn;
+					}
+				};
+
+				w.ProjectCtrl = fn.ctrl(["$scope", "$http"], function($s, $h){
+					$s.project = { title: "", state: "new", href: "#" };
+
+					$s.add = function() {
+						$s.errors = [];
+						console.log($s.project);
+						$h({method: 'POST', url: 'newproject', params: {"name":$s.project.title}})
+							.success(function(data, status, headers){
+								h = headers();
+								$s.project.href = h.location;
+								$s.project.state = 'created';
+								w.location.href = h.location;
+							})
+							.error(function(){
+								$s.errors.push("Unable to save data to server. Try again...");
+							});
+					};
+					$s.errors = [];
+					$s.haserrors = function() { return $s.errors.length > 0; };
+				});
+			}(window, jQuery));
+		</script>
 	</body>
 </html>

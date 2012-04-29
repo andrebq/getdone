@@ -44,14 +44,14 @@ func (t *Task) ById(id int64) (*entity.Task, error) {
 }
 
 func (t *Task) AllByProject(projid int64) (ret []*entity.Task, err error) {
-	it := t.db.C("tasks").Find(bson.M{"projectid":projid}).Iter()
+	it := t.db.C("tasks").Find(bson.M{"projectid": projid}).Iter()
 
 	ret, err = t.returnArray(it, projid)
 	return
 }
 
 func (t *Task) AllByState(projid int64, state bool) (ret []*entity.Task, err error) {
-	it := t.db.C("tasks").Find(bson.M{"projectid":projid, "done":state}).Iter()
+	it := t.db.C("tasks").Find(bson.M{"projectid": projid, "done": state}).Iter()
 
 	ret, err = t.returnArray(it, projid)
 	return

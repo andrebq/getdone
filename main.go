@@ -39,6 +39,8 @@ func usage() {
 func runWeb() {
 	l.Info("Preparing routes")
 	root := web.Root(*root, *prefix)
+	l.Info("Connecting to mongo server")
+	web.InitMongo("localhost");
 	l.Info("Starting server")
 	err := http.ListenAndServe(*port, root)
 	if err != nil {
