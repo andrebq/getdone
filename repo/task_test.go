@@ -2,7 +2,6 @@ package repo
 
 import (
 	"github.com/andrebq/getdone/entity"
-	"launchpad.net/mgo"
 	"reflect"
 	"testing"
 )
@@ -11,10 +10,7 @@ func TestTaskRepo(t *testing.T) {
 	p := &entity.Project{0, "test"}
 	task := &entity.Task{0, "Do something", "Do something really interesting", false, p}
 
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		t.Fatalf("Error while connecting to mongo. %v", err)
-	}
+	session := openMgoSession(t)
 	defer session.Close()
 
 	db := session.DB("testdb")
@@ -22,7 +18,7 @@ func TestTaskRepo(t *testing.T) {
 	pRepo := &Project{db}
 	tRepo := &Task{db, pRepo}
 
-	err = pRepo.Save(p)
+	err := pRepo.Save(p)
 	if err != nil {
 		t.Fatalf("Unable to save project. Cause: %v", err)
 	}
@@ -51,10 +47,7 @@ func TestAllByProj(t *testing.T) {
 	p := &entity.Project{0, "test"}
 	task := &entity.Task{0, "Do something", "Do something really interesting", false, p}
 
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		t.Fatalf("Error while connecting to mongo. %v", err)
-	}
+	session := openMgoSession(t)
 	defer session.Close()
 
 	db := session.DB("testdb")
@@ -62,7 +55,7 @@ func TestAllByProj(t *testing.T) {
 	pRepo := &Project{db}
 	tRepo := &Task{db, pRepo}
 
-	err = pRepo.Save(p)
+	err := pRepo.Save(p)
 	if err != nil {
 		t.Fatalf("Unable to save project. Cause: %v", err)
 	}
@@ -98,10 +91,7 @@ func TestAllByState(t *testing.T) {
 	p := &entity.Project{0, "test"}
 	task := &entity.Task{0, "Do something", "Do something really interesting", false, p}
 
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		t.Fatalf("Error while connecting to mongo. %v", err)
-	}
+	session := openMgoSession(t)
 	defer session.Close()
 
 	db := session.DB("testdb")
@@ -109,7 +99,7 @@ func TestAllByState(t *testing.T) {
 	pRepo := &Project{db}
 	tRepo := &Task{db, pRepo}
 
-	err = pRepo.Save(p)
+	err := pRepo.Save(p)
 	if err != nil {
 		t.Fatalf("Unable to save project. Cause: %v", err)
 	}
