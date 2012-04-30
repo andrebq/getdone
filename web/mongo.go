@@ -3,7 +3,9 @@ package web
 import (
 	"code.google.com/p/gorilla/context"
 	"launchpad.net/mgo"
+	"log"
 	"net/http"
+	"os"
 )
 
 type mongoSessionId int
@@ -15,6 +17,9 @@ var (
 
 // Must initialize the mongo session
 func InitMongo(url string) (err error) {
+	mongolog := log.New(os.Stderr, "MONGO ", log.LstdFlags)
+	mgo.SetLogger(mongolog)
+	mgo.SetDebug(true)
 	session, err = mgo.Dial(url)
 	return err
 }

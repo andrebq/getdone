@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"github.com/andrebq/getdone/entity"
 	"github.com/andrebq/getdone/repo"
 	"github.com/andrebq/getdone/uc"
 	"io"
@@ -47,12 +48,14 @@ func ListTasks(w http.ResponseWriter, req *http.Request) {
 		prepo := repo.NewProject(db)
 		lt.ProjectRepo = prepo
 		lt.TaskRepo = repo.NewTask(db, prepo)
+		print("Fetching tasks by project Id: ", projId, "\n")
 		lt.SelectProject(projId)
-		_, err := lt.AllOpen()
+		tasks, err := lt.AllOpen()
 		if err != nil {
+			l.Error("Error while fetching task list: %v", err)
 			http.Error(w, "Unable to fetch open tasks list", http.StatusInternalServerError)
 		} else {
-			_, err = WriteJson(w, nil, "", http.StatusOK)
+			_, err = WriteJson(w, tasksToJson(tasks), "", http.StatusOK)
 			if err != nil {
 				http.Error(w, "Unable to write the reponse", http.StatusInternalServerError)
 			}
@@ -62,28 +65,27 @@ func ListTasks(w http.ResponseWriter, req *http.Request) {
 
 // Add a new task
 func AddTask(w http.ResponseWriter, req *http.Request) {
-	session := Session(req)
+	// think about this method later
+	http.Error(w, "Not time to think about creating tasks", http.StatusInternalServerError)
+}
 
-	req.ParseForm()
-	projName := req.Form.Get("projectid")
-	taskTitle := req.Form.Get("title")
-	if projName == "" || taskTitle == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, "Cannot insert a task without an projectid or a title")
-	} else {
-		ct := uc.NewCreateTask()
-		db := session.DB("getdone")
-		prepo := repo.NewProject(db)
-		ct.ProjectRepo = prepo
-		ct.TaskRepo = repo.NewTask(db, prepo)
-		_, err := ct.Create(taskTitle, "")
-		if err != nil {
-			http.Error(w, "Unable to fetch open tasks list", http.StatusInternalServerError)
-		} else {
-			_, err = WriteJson(w, nil, "", http.StatusOK)
-			if err != nil {
-				http.Error(w, "Unable to write the reponse", http.StatusInternalServerError)
-			}
-		}
+func tasksToJson(t []*entity.Task) Json {
+	print("Converting ", len(t), " tasks to json\n")
+	j := make(Json)
+	for _, task := range t {
+		j.Push("tasks", jsonfyTask(task))
+	}
+	return j
+}
+
+func jsonfyTask(task *entity.Task) Json {
+	return Json{"title": task.Title,
+		"description": task.Description,
+		"done":        task.Done,
+		"id":          task.Id,
+		"project": Json{
+			"id":   task.Project.Id,
+			"name": task.Project.Name,
+		},
 	}
 }
