@@ -10,12 +10,12 @@ func TestListOpenTasks(t *testing.T) {
 
 	createPrj := NewCreateProject()
 	createPrj.ProjectRepo = pRepo
-	createPrj.Create("test")
+	proj, _ := createPrj.Create("test")
 
 	list := NewListTasks()
 	list.TaskRepo = tRepo
 	list.ProjectRepo = pRepo
-	list.SelectProject("test")
+	list.SelectProject(proj.Id)
 
 	complete := NewCompleteTask()
 	complete.TaskRepo = list.TaskRepo
@@ -23,7 +23,7 @@ func TestListOpenTasks(t *testing.T) {
 	ct := NewCreateTask()
 	ct.TaskRepo = list.TaskRepo
 	ct.ProjectRepo = list.ProjectRepo
-	ct.SelectProject("test")
+	ct.SelectProject(proj.Id)
 
 	pending, _ := ct.Create("task 1", "Execute task 1")
 
@@ -52,12 +52,12 @@ func TestListAllTasks(t *testing.T) {
 
 	createPrj := NewCreateProject()
 	createPrj.ProjectRepo = pRepo
-	createPrj.Create("test")
+	proj, _ := createPrj.Create("test")
 
 	list := NewListTasks()
 	list.TaskRepo = tRepo
 	list.ProjectRepo = pRepo
-	list.SelectProject("test")
+	list.SelectProject(proj.Id)
 
 	complete := NewCompleteTask()
 	complete.TaskRepo = list.TaskRepo
@@ -65,7 +65,7 @@ func TestListAllTasks(t *testing.T) {
 	ct := NewCreateTask()
 	ct.TaskRepo = list.TaskRepo
 	ct.ProjectRepo = list.ProjectRepo
-	ct.SelectProject("test")
+	ct.SelectProject(proj.Id)
 
 	ct.Create("task 1", "Execute task 1")
 

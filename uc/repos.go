@@ -6,7 +6,7 @@ import (
 
 // Repository to work with projects
 type ProjectRepo interface {
-	ByName(name string) (*entity.Project, error)
+	ById(id int64) (*entity.Project, error)
 	Save(p *entity.Project) error
 }
 

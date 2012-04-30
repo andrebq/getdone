@@ -12,9 +12,9 @@ func TestCompleteTask(t *testing.T) {
 
 	createPrj := NewCreateProject()
 	createPrj.ProjectRepo = create.ProjectRepo
-	createPrj.Create("test")
+	p, _ := createPrj.Create("test")
 
-	create.SelectProject("test")
+	create.SelectProject(p.Id)
 	create.Create("title", "desc")
 
 	ct := NewCompleteTask()

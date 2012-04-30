@@ -16,10 +16,10 @@ func (m *MockProjectRepo) ensureData() {
 	}
 }
 
-func (m *MockProjectRepo) ByName(name string) (*entity.Project, error) {
+func (m *MockProjectRepo) ById(id int64) (*entity.Project, error) {
 	m.ensureData()
 	for _, v := range m.data {
-		if v.Name == name {
+		if v.Id == id {
 			return v, nil
 		}
 	}

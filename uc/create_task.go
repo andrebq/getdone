@@ -12,9 +12,9 @@ type CreateTask struct {
 }
 
 // Select the project to create the task
-func (c *CreateTask) SelectProject(name string) (*entity.Project, error) {
+func (c *CreateTask) SelectProject(id int64) (*entity.Project, error) {
 	var err error
-	c.project, err = c.ProjectRepo.ByName(name)
+	c.project, err = c.ProjectRepo.ById(id)
 
 	return c.project, err
 }

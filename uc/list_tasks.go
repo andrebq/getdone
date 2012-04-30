@@ -11,9 +11,9 @@ type ListTasks struct {
 	p           *entity.Project
 }
 
-func (l *ListTasks) SelectProject(name string) (*entity.Project, error) {
+func (l *ListTasks) SelectProject(id int64) (*entity.Project, error) {
 	var err error
-	l.p, err = l.ProjectRepo.ByName(name)
+	l.p, err = l.ProjectRepo.ById(id)
 	return l.p, err
 }
 
