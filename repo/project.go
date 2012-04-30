@@ -25,13 +25,6 @@ func (p *Project) Save(proj *entity.Project) error {
 	return err
 }
 
-// Fetch the project by name
-func (p *Project) ByName(name string) (*entity.Project, error) {
-	dt := &data.Project{}
-	err := p.db.C("projects").Find(bson.M{"name": name}).One(&dt)
-	return p.dataToEntity(dt), err
-}
-
 // Fetch the project by id
 func (p *Project) ById(id int64) (*entity.Project, error) {
 	dt := &data.Project{}

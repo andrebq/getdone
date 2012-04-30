@@ -24,7 +24,7 @@ func TestProject(t *testing.T) {
 		t.Fatalf("Error while saving project. %v", err)
 	}
 
-	p2, err := repo.ByName("test")
+	p2, err := repo.ById(p.Id)
 	if err != nil {
 		t.Fatalf("Error while fetching project. %v", err)
 	}

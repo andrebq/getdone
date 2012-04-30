@@ -3,8 +3,17 @@
 	<head>
 		<title>GetDone - Task listing</title>
 		<link rel="stylesheet" type="text/css" href="style/normalize.css">
+		<style>
+			ul.errorlist-true {
+				display: block;
+			}
+			ul.errorlist-false {
+				display: none;
+			}
+		</style>
 		<!-- <link rel="stylesheet" type="text/css" href="style/main.css"> -->
 		<script type="text/javascript" src="script/jquery.js"></script>
+		<script type="text/javascript" src="script/queryString.jQuery.js"></script>
 		<script type="text/javascript" src="script/angular.js"></script>
 		<script type="text/javascript">
 			(function(w, $){
@@ -16,31 +25,46 @@
 					ctrl: function(deps, ctrl) {
 						ctrl.$inject = deps;
 						return ctrl;
+					},
+					projId : function(qs) {
+						return $.qs(qs)["projectid"];
 					}
 				}
 				w.UserCtrl = fn.ctrl(["$scope"], function($s) {
 					$s.name = "Andre Moraes";
 				});
 
-				w.TaskCtrl = fn.ctrl(["$scope","$http"], function($s, $http) {
+				w.TaskCtrl = fn.ctrl(["$scope","$http", "$window"], function($s, $http, $window) {
 					$s.tasks = [ ];
 					$s.addTask = function() {
-						$s.task.done = false;
-						$s.tasks.push($s.task);
-						$s.clear();
+						$http({method: 'POST', url: 'addTask', params: {title:$scope.task.title, projectid: $scope.task.projectId}})
+							.success(function(data, status){
+								// just fetch everything again
+								// could be better
+								$s.fetch();
+								$s.clear();
+							})
+							.error(function(){
+								$s.errors = ["Unable to include task. Try again..."];
+							});
 					};
 					$s.clear = function() {
 						$s.task = {done:false, title:""};
+						$s.errors = [];
 						fn.focusFirst();
 					};
 					$s.fetch = function() {
-						$http.get('tasks.json').success(function(data, status){
+						$http({method:'GET', url:'tasks.json', params: {'projectid':fn.projId($window.location.search)}}).success(function(data, status){
 							$s.tasks = data;
 						}).error(function(){console.log('unable to fetch data');});
+					};
+					$s.hasError = function(){
+						return $s.errors && $s.errors.length > 0;
 					};
 					$s.inputName = "Describe the task.";
 
 					// do the first fetch automagically
+					$s.clear();
 					$s.fetch();
 				});
 
@@ -63,6 +87,9 @@
 			<form>
 				<input type="text" placeholder="{{emptyTask.title}}" ng-model="task.title" data-focus>
 				<button ng-click="addTask()">Add</button>
+				<ul class="errorlist-{{hasError()}}">
+					<li ng-repeat="error in errors"><span>{{error}}</span></li>
+				</ul>
 			</form>
 		</div>
 	</body>

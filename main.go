@@ -5,6 +5,7 @@ import (
 	"github.com/andrebq/getdone/log"
 	"github.com/andrebq/getdone/web"
 	"net/http"
+	"os"
 )
 
 var (
@@ -38,11 +39,16 @@ func usage() {
 
 func runWeb() {
 	l.Info("Preparing routes")
-	root := web.Root(*root, *prefix)
+	l.Info("Root folder: %v", *root)
+	rootHandler := web.Root(*root, *prefix)
 	l.Info("Connecting to mongo server")
-	web.InitMongo("localhost");
-	l.Info("Starting server")
-	err := http.ListenAndServe(*port, root)
+	err := web.InitMongo("localhost");
+	if err != nil {
+		l.Error("Error while connecting to mongo db. %v", err)
+		os.Exit(1)
+	}
+	l.Info("Starting server @ %v", *port)
+	err = http.ListenAndServe(*port, rootHandler)
 	if err != nil {
 		l.Error("Error while starting server. %v", err)
 	} else {
