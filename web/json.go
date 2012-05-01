@@ -1,5 +1,9 @@
 package web
 
+import (
+	"encoding/json"
+)
+
 type Json map[string]interface{}
 
 func (j Json) Put(key string, value interface{}) Json {
@@ -24,4 +28,20 @@ func (j Json) Push(key string, value interface{}) Json {
 	arr = append(arr.([]interface{}), value)
 	j.Put(key, arr)
 	return j
+}
+
+func (j Json) Array(key string) []interface{} {
+	arr := j.Get(key)
+	if arr != nil {
+		return arr.([]interface{})
+	}
+	return nil
+}
+
+func (j Json) String() string {
+	buff, err := json.Marshal(j)
+	if err != nil {
+		return err.Error()
+	}
+	return string(buff)
 }
