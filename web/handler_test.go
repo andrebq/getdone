@@ -47,10 +47,13 @@ func readResponseBody(t *testing.T, resp *http.Response) string {
 
 func TestCreateProject(t *testing.T) {
 	initMgo(t)
-	server := httptest.NewServer(EnsureSession(http.HandlerFunc(CreateProject)))
+	server := httptest.NewServer(Root("./", ""))
 	defer server.Close()
 
-	resp, err := http.PostForm(server.URL, url.Values{"name": {"testproject"}})
+	s := session.Copy()
+	defer s.DB("getdone").DropDatabase()
+
+	resp, err := http.PostForm(server.URL+"/newproject", url.Values{"name": {"testproject"}})
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
@@ -64,17 +67,18 @@ func TestCreateProject(t *testing.T) {
 
 func TestListTasks(t *testing.T) {
 	initMgo(t)
-	server := httptest.NewServer(EnsureSession(http.HandlerFunc(ListTasks)))
+	server := httptest.NewServer(Root("./", ""))
 
 	s := session.Copy()
-	defer s.Close()
+	defer s.DB("getdone").DropDatabase()
 
-	proj := make(Json).Put("name", "prjtest").Put("id", time.Now().UnixNano())
+	proj := Json{"name": "prjtest", "id": time.Now().UnixNano()}
 	insertInMgo(t, "projects", proj)
-	task := make(Json).Put("title", "task1").Put("description", "task1").Put("done", false).Put("projectid", proj.Get("id").(int64)).Put("id", time.Now().UnixNano())
+
+	task := Json{"title": "task1", "description": "task1", "done": false, "projectid": proj.Get("id").(int64), "id": time.Now().UnixNano()}
 	insertInMgo(t, "tasks", task)
 
-	u, _ := url.Parse(server.URL)
+	u, _ := url.Parse(server.URL + "/tasks.json")
 	q := u.Query()
 	q.Set("projectid", strconv.FormatInt(proj.Get("id").(int64), 10))
 	u.RawQuery = q.Encode()
@@ -100,11 +104,13 @@ func TestListTasks(t *testing.T) {
 	delete(task, "projectid")
 	task.Put("project", proj)
 	respJson = Json(respJson.Array("tasks")[0].(map[string]interface{}))
+
 	// problem with longs
 	// the encoding/json package converts numbers to float64 when using map[string]interface{}
 	// so, this code unmarshal a Json into itself to force the float64 conversion.
 	// no error should happen since the Json object is valid
 	json.Unmarshal([]byte(task.String()), &task)
+
 	if !reflect.DeepEqual(task, respJson) {
 		t.Errorf("Expecting %v got %v", task, respJson)
 	}
