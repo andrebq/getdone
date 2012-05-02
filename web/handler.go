@@ -65,8 +65,40 @@ func ListTasks(w http.ResponseWriter, req *http.Request) {
 
 // Add a new task
 func AddTask(w http.ResponseWriter, req *http.Request) {
-	// think about this method later
-	http.Error(w, "Not time to think about creating tasks", http.StatusInternalServerError)
+	session := Session(req)
+
+	req.ParseForm()
+	projId, err := strconv.ParseInt(req.Form.Get("projectid"), 10, 64)
+	if err != nil {
+		l.Error("Error while parsing projectid: %v", err)
+		return
+	}
+
+	title := req.Form.Get("title")
+	if err != nil || projId <= 0 || len(title) == 0 {
+		http.Error(w, fmt.Sprintf("Invalid parameters on the request. ProjId %v, title %v", projId, title), http.StatusBadRequest)
+		return
+	}
+
+	ct := uc.NewCreateTask()
+	db := session.DB("getdone")
+	prepo := repo.NewProject(db)
+	trepo := repo.NewTask(db, prepo)
+	ct.ProjectRepo = prepo
+	ct.TaskRepo = trepo
+
+	ct.SelectProject(projId)
+	newTask, err := ct.Create(title, "")
+	if err != nil {
+		l.Error("Error while creating task. %v", err)
+		http.Error(w, "Unable to create a new task", http.StatusInternalServerError)
+		return
+	}
+	_, err = WriteJson(w, jsonfyTask(newTask), "", http.StatusOK)
+	if err != nil {
+		l.Error("Unable to write the response. %v", err)
+		http.Error(w, "Unable to write the response", http.StatusInternalServerError)
+	}
 }
 
 func tasksToJson(t []*entity.Task) Json {

@@ -37,15 +37,18 @@
 				w.TaskCtrl = fn.ctrl(["$scope","$http", "$window"], function($s, $http, $window) {
 					$s.tasks = [ ];
 					$s.addTask = function() {
-						$http({method: 'POST', url: 'addTask', params: {title:$scope.task.title, projectid: $scope.task.projectId}})
-							.success(function(data, status){
+						$http({method: 'POST', 
+							url: 'addtask', 
+							params: {title:$s.task.title, 
+								projectid: fn.projId($window.location.search)}})
+						.success(function(data, status){
 								// just fetch everything again
 								// could be better
 								$s.fetch();
 								$s.clear();
 							})
-							.error(function(){
-								$s.errors = ["Unable to include task. Try again..."];
+						.error(function(data){
+								$s.errors = ["Unable to include task. Try again later"];
 							});
 					};
 					$s.clear = function() {
@@ -54,9 +57,15 @@
 						fn.focusFirst();
 					};
 					$s.fetch = function() {
-						$http({method:'GET', url:'tasks.json', params: {'projectid':fn.projId($window.location.search)}}).success(function(data, status){
-							$s.tasks = data;
-						}).error(function(){console.log('unable to fetch data');});
+						$http({method:'GET', 
+							url:'tasks.json', 
+							params: {'projectid':fn.projId($window.location.search)}})
+						.success(function(data, status){
+							$s.tasks = data.tasks;
+						})
+						.error(function(){
+							console.log('unable to fetch data');
+						});
 					};
 					$s.hasError = function(){
 						return $s.errors && $s.errors.length > 0;

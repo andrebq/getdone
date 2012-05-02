@@ -21,6 +21,7 @@ func Root(root, prefix string) http.Handler {
 
 	// mapping the API
 	mux.Post("/newproject", EnsureSession(http.HandlerFunc(CreateProject)))
+	mux.Post("/addtask", EnsureSession(http.HandlerFunc(AddTask)))
 	mux.Get("/tasks.json", EnsureSession(http.HandlerFunc(ListTasks)))
 
 	// mapping static assets and files

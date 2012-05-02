@@ -39,7 +39,7 @@ func EnsureSession(hndl http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		s := Session(req)
 		if s == nil {
-			s = session.Clone()
+			s = session.Copy()
 			context.DefaultContext.Set(req, sid, s)
 		}
 		defer s.Close()
